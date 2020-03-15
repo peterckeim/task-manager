@@ -49,6 +49,7 @@ const userSchema = new mongoose.Schema({
     }]
 })
 
+// Generates an auth token (JWT) for the specific user.
 userSchema.methods.generateAuthToken = async function () {
     const user = this
     const token = jwt.sign({ _id: user._id.toString()}, 'gohomeandbeafamilyman')
@@ -57,6 +58,16 @@ userSchema.methods.generateAuthToken = async function () {
     await user.save()
 
     return token
+}
+
+userSchema.methods.toJSON = function () {
+    const user = this
+    const userObject = user.toObject()
+
+    delete userObject.password
+    delete userObject.tokens
+
+    return userObject
 }
 
 // Creates a function which the schema can use

@@ -1,6 +1,7 @@
 const express = require('express')
 const User = require('../models/user')
 const auth = require('../middleware/auth')
+const multer = require('multer')
 const router = new express.Router()
 
 // Create a new user (credentials on body in JSON)
@@ -73,6 +74,25 @@ router.delete('/users/me', auth, async (req, res) => {
         await req.user.remove()
         res.send(req.user)
     } catch (e) { res.status(500).send(e) }
+})
+
+// Set up multer to point to the images directory
+const upload = multer({
+    dest: 'avatars',
+    limits: {
+        fileSize: 1000000
+    },
+    fileFilter(req, file, cb) {
+        if (!file.originalname.match(/\.(doc|docx)$/)) {
+           return cb(new Error('Please upload a word document'))
+        }
+        cb(undefined, true)
+    }
+})
+
+// POST a user picture for their avatar
+router.post('/users/me/avatar', upload.single('avatar'), (req, res) => {
+    res.send()
 })
 
 
